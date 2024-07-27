@@ -1,5 +1,18 @@
+# IDE settings
 .idea/
-db.sqlite3
-migrations/
+
+# Python bytecode
 *.pyc
-venv/
+
+# Database
+/db.sqlite3
+migrations/
+
+# Production settings
+/production_settings.py
+
+# Static files
+/static/
+
+# Python virtual environment
+/venv/
