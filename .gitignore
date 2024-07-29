@@ -1,5 +1,6 @@
 # IDE settings
 .idea/
+.vscode/
 
 # Python bytecode
 *.pyc
@@ -9,7 +10,7 @@
 migrations/
 
 # Production settings
-/production_settings.py
+config.json
 
 # Static files
 /static/
