@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Список учебных планов{% endblock %}
+{% block body %}
+<table>
+  <thead>
+  <tr>
+    <th>Код</th>
+    <th>Название</th>
+    <th>Уровень</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for edu_plan in edu_plans %}
+  <tr>
+    <td>{{ edu_plan.code }}</td>
+    <td>{{ edu_plan.name }}</td>
+    <td>{{ edu_plan.degree }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a href="{{ url_for('edu_plan_load') }}">Добавить</a>
+{% endblock %}

@@ -1,23 +1,16 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>Автоматизация бумажной работы</title>
-  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Добро пожаловать!{% endblock %}
+{% block body %}
   <script src="https://accounts.google.com/gsi/client?hl=ru" async></script>
-  <h1>Добро пожаловать!</h1>
-  {% if 'username' in session %}
-  <p>{{ session['username'] }}</p>
+  {% if 'user' in session %}
+  <p>{{ session['user']['name'] }}</p>
   <a href="{{ url_for('logout') }}">Выйти</a>
   {% else %}
-  <div id='g_id_onload'
+  <div id="g_id_onload"
        data-auto_prompt="false"
        data-client_id="{{ client_id }}"
        data-login_uri="{{ url_for('login', _external=True) }}"
        data-ux_mode="redirect"></div>
   <div class="g_id_signin" data-locale="ru"></div>
   {% endif %}
-</body>
-</html>
+{% endblock %}

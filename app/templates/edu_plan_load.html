@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Загрузка учебного плана{% endblock %}
+{% block body %}
+<form method="post" enctype="multipart/form-data">
+  <input type="file" name="plan" id="plan">
+  <input type="submit" value="Загрузить">
+</form>
+{% endblock %}

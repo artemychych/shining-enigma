@@ -56,8 +56,8 @@ class EducationPlanAdmin(admin.ModelAdmin):
 #     ]
 
 
-admin.site.register(models.EducationPlan, EducationPlanAdmin)
+# admin.site.register(models.EducationPlan, EducationPlanAdmin)
 # admin.site.register(models.StudyGroup, StudyGroupAdmin)
-admin.site.register(models.SubjectPlan)
+# admin.site.register(models.SubjectPlan)
 # admin.site.register(models.Teacher)
 # admin.site.register(models.TeacherSubject)
