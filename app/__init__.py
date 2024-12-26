@@ -1,23 +1,18 @@
-import json
-
 from flask import Flask
-
-from app import models, views
-
+from app.extensions import db, migrate
 
 def create_app():
     app = Flask(__name__)
-
-    app.config.from_envvar('APP_CONFIG')
-
-    models.db.init_app(app)
-
-    app.add_url_rule('/', view_func=views.index_page)
-    app.add_url_rule('/login/', view_func=views.login, methods=['POST'])
-    app.add_url_rule('/logout/', view_func=views.logout)
-
-    app.add_url_rule('/edu_plan/', view_func=views.edu_plan_list)
-    app.add_url_rule('/edu_plan_load/', view_func=views.edu_plan_load,
-                     methods=['GET', 'POST'])
+    
+    from config import Config
+    app.config.from_object(Config)
+   
+    db.init_app(app)
+    migrate.init_app(app, db)
+    
+    from app.main import bp as main_bp
+    app.register_blueprint(main_bp)
 
     return app
+
+from app import models 

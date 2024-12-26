@@ -1,23 +1,60 @@
 {% extends "base.html" %}
-{% block title %}Список учебных планов{% endblock %}
 {% block body %}
-<table>
-  <thead>
-  <tr>
-    <th>Код</th>
-    <th>Название</th>
-    <th>Уровень</th>
-  </tr>
-  </thead>
-  <tbody>
-  {% for edu_plan in edu_plans %}
-  <tr>
-    <td>{{ edu_plan.code }}</td>
-    <td>{{ edu_plan.name }}</td>
-    <td>{{ edu_plan.degree }}</td>
-  </tr>
-  {% endfor %}
-  </tbody>
-</table>
-<a href="{{ url_for('edu_plan_load') }}">Добавить</a>
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Учебные планы</h1>
+        <a href="{{ url_for('main.edu_plan_load') }}" 
+           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Загрузить новый план
+        </a>
+    </div>
+
+    {% if edu_plans %}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Код</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Степень</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Комментарий</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for plan in edu_plans %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {{ plan.code }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ plan.name }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ plan.degree }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ plan.comment if plan.comment else '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <a href="{{ url_for('main.edu_plan_download', filename=plan.file) }}" 
+                           class="text-blue-600 hover:text-blue-900">
+                            Скачать
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-8">
+        <p class="text-gray-500">Учебные планы не найдены</p>
+        <a href="{{ url_for('main.edu_plan_load') }}" 
+           class="mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Загрузить первый план
+        </a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

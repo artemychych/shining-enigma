@@ -1,8 +1,38 @@
 {% extends "base.html" %}
-{% block title %}Загрузка учебного плана{% endblock %}
 {% block body %}
-<form method="post" enctype="multipart/form-data">
-  <input type="file" name="plan" id="plan">
-  <input type="submit" value="Загрузить">
-</form>
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-xl font-bold mb-4">Загрузка учебного плана</h2>
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label for="plan" class="block text-sm font-medium text-gray-700 mb-2">
+                        Выберите файл .plx
+                    </label>
+                    <input type="file" 
+                           name="plan" 
+                           id="plan" 
+                           accept=".plx"
+                           required
+                           class="block w-full text-sm text-gray-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <a href="{{ url_for('main.edu_plan_list') }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Отмена
+                    </a>
+                    <button type="submit" 
+                            class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Загрузить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

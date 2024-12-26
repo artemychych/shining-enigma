@@ -1,16 +1,196 @@
 {% extends "base.html" %}
-{% block title %}Добро пожаловать!{% endblock %}
 {% block body %}
   <script src="https://accounts.google.com/gsi/client?hl=ru" async></script>
   {% if 'user' in session %}
-  <p>{{ session['user']['name'] }}</p>
-  <a href="{{ url_for('logout') }}">Выйти</a>
+  
+
+  <!-- YAML Editor Section -->
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">YAML Редактор</h1>
+      <div class="flex gap-2">
+        <input type="file" id="yamlFileInput" accept=".yaml" class="hidden" onchange="handleFileUpload(event)">
+        <button onclick="document.getElementById('yamlFileInput').click()" 
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Загрузить файл
+        </button>
+        <button onclick="createNewDocument()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Создать новый
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Document List -->
+      <div class="md:col-span-1 bg-white p-4 rounded-lg shadow">
+        <h2 class="text-lg font-semibold mb-4">Документы</h2>
+        <ul id="documentList" class="space-y-2"></ul>
+      </div>
+
+      <!-- Editor -->
+      <div class="md:col-span-3 bg-white p-4 rounded-lg shadow">
+        <div class="mb-4">
+          <input type="text" id="documentName" placeholder="Название документа" class="w-full p-2 border rounded">
+        </div>
+        <!--   -->
+      
+          <textarea id="yamlEditor" class="w-full h-96 font-mono p-2 border rounded" placeholder="Введите YAML содержимое..."></textarea>
+       
+        
+        <div class="flex justify-end mt-4 space-x-2">
+          <button onclick="downloadYaml()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Скачать YAML
+          </button>
+          <button onclick="saveDocument()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Сохранить
+          </button>
+          <button onclick="deleteDocument()" id="deleteButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hidden">
+            Удалить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentDocId = null;
+
+    async function loadDocuments() {
+      const response = await fetch('/api/yaml/');
+      const documents = await response.json();
+      const list = document.getElementById('documentList');
+      list.innerHTML = '';
+      
+      documents.forEach(doc => {
+        const item = document.createElement('div');
+        item.className = 'p-2 hover:bg-gray-100 cursor-pointer rounded';
+        item.textContent = doc.name;
+        item.onclick = () => loadDocument(doc.id);
+        list.appendChild(item);
+      });
+    }
+
+    async function loadDocument(id) {
+      const response = await fetch(`/api/yaml/${id}`);
+      const doc = await response.json();
+      
+      document.getElementById('documentName').value = doc.name;
+      document.getElementById('yamlEditor').value = doc.content;
+      document.getElementById('deleteButton').classList.remove('hidden');
+      currentDocId = doc.id;
+    }
+
+    async function saveDocument() {
+      const name = document.getElementById('documentName').value;
+      const content = document.getElementById('yamlEditor').value;
+      
+      if (!name || !content) {
+          alert('Заполните название и содержимое документа');
+          return;
+      }
+
+      try {
+          const response = await fetch('/api/yaml/save', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  id: currentDocId,
+                  name: name,
+                  content: content
+              })
+          });
+
+          if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(errorText);
+          }
+
+          const result = await response.json();
+          await loadDocuments();
+          
+          if (!currentDocId) {
+              currentDocId = result.id;
+              document.getElementById('deleteButton').classList.remove('hidden');
+          }
+      } catch (error) {
+          alert(`Ошибка: ${error.message}`);
+      }
+    }
+
+    async function deleteDocument() {
+      if (!currentDocId || !confirm('Вы уверены, что хотите удалить этот документ?')) {
+        return;
+      }
+
+      const response = await fetch(`/api/yaml/delete/${currentDocId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        clearEditor();
+        loadDocuments();
+      }
+    }
+
+    function createNewDocument() {
+      clearEditor();
+    }
+
+    function clearEditor() {
+      document.getElementById('documentName').value = '';
+      document.getElementById('yamlEditor').value = '';
+      document.getElementById('deleteButton').classList.add('hidden');
+      currentDocId = null;
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('yamlEditor').value = e.target.result;
+          document.getElementById('documentName').value = file.name.replace('.yaml', '');
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    function downloadYaml() {
+      const content = document.getElementById('yamlEditor').value;
+      const name = document.getElementById('documentName').value;
+      if (!content) {
+        alert('Нет содержимого для скачивания');
+        return;
+      }
+
+      const blob = new Blob([content], { type: 'text/yaml' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${name}.yaml`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+
+    // Load documents when page loads
+    document.addEventListener('DOMContentLoaded', loadDocuments);
+  </script>
   {% else %}
-  <div id="g_id_onload"
-       data-auto_prompt="false"
-       data-client_id="{{ client_id }}"
-       data-login_uri="{{ url_for('login', _external=True) }}"
-       data-ux_mode="redirect"></div>
-  <div class="g_id_signin" data-locale="ru"></div>
+  <div class="min-h-screen w-full flex flex-col justify-center items-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+      <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Автоматизация бумажной работы</h1>
+      <div id="g_id_onload"
+           data-auto_prompt="false"
+           data-client_id="{{ client_id }}"
+           data-login_uri="{{ url_for('main.login', _external=True) }}"
+           data-ux_mode="redirect">
+      </div>
+      <div class="g_id_signin" data-locale="ru" data-type="standard" data-size="large" data-theme="outline" data-shape="rectangular"></div>
+    </div>
+  </div>
   {% endif %}
 {% endblock %}

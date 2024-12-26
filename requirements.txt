@@ -3,3 +3,5 @@ flask-sqlalchemy
 google-auth
 gunicorn
 sqlalchemy
+pyyaml
+flask-migrate
